@@ -1,3 +1,10 @@
+/**
+ * @file udev_demo.h
+ * @brief Header file for a breif demonstration of some libudev features.
+ * @author Travis Lane
+ * @version 1.0.0
+ * @date 2014-10-10
+ */
 
 
 #ifndef UDEV_DEMO_H

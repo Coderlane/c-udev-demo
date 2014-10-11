@@ -1,9 +1,21 @@
-
+/**
+ * @file udev_demo.c
+ * @brief A breif demonstration of some libudev features.
+ * I'm mostly looking to see what information I can get from it. 
+ * @author Travis Lane
+ * @version 1.0.0 
+ * @date 2014-10-10
+ */
 
 #include <udev_demo.h>
 
 static struct udev *global_udev = NULL;
 
+/**
+ * @brief Initialize the demonstration.
+ *
+ * @return A status code.
+ */
 int init_demo() {
 	if(global_udev != NULL) {
 		return -1;
@@ -13,7 +25,11 @@ int init_demo() {
 	return 0;
 }
 
-
+/**
+ * @brief Cleanup the demo.
+ *
+ * @return A status code.
+ */
 int cleanup_demo() {
 	if(global_udev == NULL) {
 		return 0;
@@ -22,7 +38,17 @@ int cleanup_demo() {
 	return 0;
 }
 
-
+/**
+ * @brief Run the demo on the input.
+ * No args = list all.
+ * one arg = list based on sysattr.
+ * two arg = list based on sysattr and value.
+ *
+ * @param argc argc from main.
+ * @param argv argv from main.
+ *
+ * @return A status code.
+ */
 int run_demo(int argc, char **argv) {
 	if(argc == 1) {
 		list_all();
@@ -37,12 +63,19 @@ int run_demo(int argc, char **argv) {
 }
 
 
+/**
+ * @brief List all devices and their properites.
+ *
+ * @return A status code.
+ */
 int list_all() {
 	struct udev_enumerate *enumer = NULL;
 	struct udev_list_entry *devs = NULL; 
 
+	// Setup the enumeration.
 	enumer = udev_enumerate_new(global_udev);
 	udev_enumerate_scan_devices(enumer);
+	// Scan and get the list of items.
 	devs = udev_enumerate_get_list_entry(enumer);
 
 	list_devs(devs);
@@ -52,23 +85,40 @@ int list_all() {
 	return 0;
 }
 
+/**
+ * @brief List entries filtered by sysattr and value if specified.
+ *
+ * @param sysattr The sysattr we should search for.
+ * @param value The value we should search for, or NULL.
+ *
+ * @return A status code. 
+ */
 int list_sysattr(char *sysattr, char *value) {
 	struct udev_enumerate *enumer = NULL;
 	struct udev_list_entry *devs = NULL; 
 
+	// Set up the enumeration
 	enumer = udev_enumerate_new(global_udev);
+	// Look for the input values
 	udev_enumerate_add_match_sysattr(enumer, sysattr, value);
+	// Scan and get the list of items found.
 	udev_enumerate_scan_devices(enumer);
 	devs = udev_enumerate_get_list_entry(enumer);
 
 	list_devs(devs);
 
 	udev_enumerate_unref(enumer);
-
 	return 0;
 }
 
-
+/**
+ * @brief List the devices found.
+ * Print the syspath and all properties.
+ *
+ * @param devs The list of devices found.
+ *
+ * @return A status code.
+ */
 int list_devs(struct udev_list_entry *devs) {
 	struct udev_list_entry *dev_entry = NULL, 
 												 *dev_property = NULL, *dev_properties = NULL;
