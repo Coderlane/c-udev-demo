@@ -23,39 +23,19 @@ int cleanup_demo() {
 }
 
 
-int run_demo() {
-	enum udev_demo_option opt;
-
-	while((opt = get_option()) != UD_OPT_EXIT) {
-		switch(opt) {
-			case UD_OPT_LIST_ALL:
-				list_all();
-				break;
-			case UD_OPT_LIST_SUBSYSTEM:
-				list_subsystem();
-				break;
-			default:
-				printf("Invalid Option!\n");
-				break;
-		}
+int run_demo(int argc, char **argv) {
+	if(argc == 1) {
+		list_all();
+	} else if(argc == 2) {
+		list_sysattr(argv[1], NULL);
+	} else if(argc == 3) {
+		list_sysattr(argv[1], argv[2]);
+	} else {
+		return -1;
 	}
-	return -1;
+	return 0;
 }
 
-enum udev_demo_option get_option() {
-	int input = -1;
-	while(input == -1) {
-		printf("1: List All\n");
-		printf("2: List Subsystem\n");
-		printf("3: Exit Demo\n");
-		printf("Choice: ");
-		scanf("%d", &input);
-		if(input < UD_OPT_LIST_ALL || input > UD_OPT_EXIT) {
-			input = -1;
-		}	
-	}
-	return input;
-}
 
 int list_all() {
 	struct udev_enumerate *enumer = NULL;
@@ -72,9 +52,20 @@ int list_all() {
 	return 0;
 }
 
-int list_subsystem() {
+int list_sysattr(char *sysattr, char *value) {
+	struct udev_enumerate *enumer = NULL;
+	struct udev_list_entry *devs = NULL; 
 
-	return -1;
+	enumer = udev_enumerate_new(global_udev);
+	udev_enumerate_add_match_sysattr(enumer, sysattr, value);
+	udev_enumerate_scan_devices(enumer);
+	devs = udev_enumerate_get_list_entry(enumer);
+
+	list_devs(devs);
+
+	udev_enumerate_unref(enumer);
+
+	return 0;
 }
 
 
