@@ -88,7 +88,8 @@ int list_devs(struct udev_list_entry *devs) {
 		dev = udev_device_new_from_syspath(global_udev, path);
 
 		printf("dev name: %s\n", path);
-		printf("dev path: %s\n", udev_device_get_devnode(dev));
+		printf("dev subsystem: %s\n", udev_device_get_subsystem(dev));
+		printf("dev path: %s\n\n", udev_device_get_devnode(dev));
 	}
 	return 0;
 }
