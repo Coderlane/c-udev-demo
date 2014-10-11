@@ -70,17 +70,26 @@ int list_sysattr(char *sysattr, char *value) {
 
 
 int list_devs(struct udev_list_entry *devs) {
-	struct udev_list_entry *dev_entry = NULL;
+	struct udev_list_entry *dev_entry = NULL, 
+												 *dev_property = NULL, *dev_properties = NULL;
 	struct udev_device *dev = NULL;
-
+	const char *path;
+	
 	udev_list_entry_foreach(dev_entry, devs) {
-		const char *path;
 		path = udev_list_entry_get_name(dev_entry);
 		dev = udev_device_new_from_syspath(global_udev, path);
 
-		printf("dev name: %s\n", path);
-		printf("dev subsystem: %s\n", udev_device_get_subsystem(dev));
-		printf("dev path: %s\n\n", udev_device_get_devnode(dev));
+		// Print the device name.
+		printf("SYSPATH:%s\n", path);
+
+		// Get and print the properties
+		dev_properties = udev_device_get_properties_list_entry(dev);
+		udev_list_entry_foreach(dev_property, dev_properties) {
+			printf("%s:%s\n", 
+					udev_list_entry_get_name(dev_property),
+					udev_list_entry_get_value(dev_property));
+		}
+		printf("\n");
 	}
 	return 0;
 }
