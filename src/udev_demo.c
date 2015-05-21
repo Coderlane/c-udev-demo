@@ -121,7 +121,8 @@ int list_sysattr(char *sysattr, char *value) {
  */
 int list_devs(struct udev_list_entry *devs) {
 	struct udev_list_entry *dev_entry = NULL, 
-												 *dev_property = NULL, *dev_properties = NULL;
+												 *dev_property = NULL, *dev_properties = NULL,
+												 *dev_attribute = NULL, *dev_attributes = NULL;
 	struct udev_device *dev = NULL;
 	const char *path;
 	
@@ -129,15 +130,26 @@ int list_devs(struct udev_list_entry *devs) {
 		path = udev_list_entry_get_name(dev_entry);
 		dev = udev_device_new_from_syspath(global_udev, path);
 
+		printf("Device\n");
 		// Print the device name.
 		printf("SYSPATH:%s\n", path);
 
+		printf("Properties\n");
 		// Get and print the properties
 		dev_properties = udev_device_get_properties_list_entry(dev);
 		udev_list_entry_foreach(dev_property, dev_properties) {
 			printf("%s:%s\n", 
 					udev_list_entry_get_name(dev_property),
 					udev_list_entry_get_value(dev_property));
+		}
+		
+		printf("Attributes\n");
+		// Get and print the attributes
+		dev_attributes = udev_device_get_sysattr_list_entry(dev);
+		udev_list_entry_foreach(dev_attribute, dev_attributes) {
+			const char *attr = udev_list_entry_get_name(dev_attribute);
+			const char *value = udev_device_get_sysattr_value(dev, attr);
+			printf("%s:%s\n", attr, value);
 		}
 		printf("\n");
 	}
